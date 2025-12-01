@@ -1,0 +1,49 @@
+Rk,Week,Day,Date,,Winner/tie,,Loser/tie,,PtsW,PtsL,YdsW,TOW,YdsL,TOL
+1,7,Sun,1937-10-17,W,Washington Redskins,,Pittsburgh Pirates,boxscore,34,20,0,0,0,0
+2,8,Sun,1946-10-27,W,San Francisco 49ers,@,Cleveland Browns,boxscore,34,20,357,2,338,6
+3,1,Sun,1958-09-28,W,Chicago Bears,@,Green Bay Packers,boxscore,34,20,300,3,217,3
+4,12,Sun,1958-12-14,W,Los Angeles Rams,,Green Bay Packers,boxscore,34,20,357,3,279,1
+5,7,Sun,1963-10-27,W,Green Bay Packers,@,Baltimore Colts,boxscore,34,20,312,4,300,6
+6,1,Sun,1968-09-15,W,New York Giants,@,Pittsburgh Steelers,boxscore,34,20,331,2,324,4
+7,2,Sun,1969-09-21,W,Cincinnati Bengals,,San Diego Chargers,boxscore,34,20,472,2,395,1
+8,5,Mon,1970-10-19,W,Oakland Raiders,,Washington Redskins,boxscore,34,20,458,1,301,0
+9,3,Mon,1971-10-04,W,Oakland Raiders,@,Cleveland Browns,boxscore,34,20,328,2,334,3
+10,6,Sun,1972-10-22,W,Detroit Lions,,San Diego Chargers,boxscore,34,20,324,2,225,3
+11,11,Sun,1972-11-26,W,San Diego Chargers,,Houston Oilers,boxscore,34,20,367,1,213,1
+12,13,Sun,1975-12-14,W,St. Louis Cardinals,@,Chicago Bears,boxscore,34,20,362,1,326,2
+13,11,Sun,1977-11-27,W,Houston Oilers,,Kansas City Chiefs,boxscore,34,20,370,6,337,3
+14,12,Sun,1979-11-18,W,Washington Redskins,,Dallas Cowboys,boxscore,34,20,306,0,384,5
+15,11,Sun,1981-11-15,W,Pittsburgh Steelers,@,Atlanta Falcons,boxscore,34,20,293,3,441,6
+16,11,Sun,1985-11-17,W,Miami Dolphins,@,Indianapolis Colts,boxscore,34,20,458,2,352,4
+17,4,Sun,1986-09-28,W,Philadelphia Eagles,,Los Angeles Rams,boxscore,34,20,395,1,320,3
+18,1,Sun,1989-09-10,W,Denver Broncos,,Kansas City Chiefs,boxscore,34,20,250,2,287,4
+19,7,Sun,1989-10-22,W,Phoenix Cardinals,,Atlanta Falcons,boxscore,34,20,299,1,351,2
+20,12,Sun,1990-11-25,W,Indianapolis Colts,@,Cincinnati Bengals,boxscore,34,20,419,0,381,3
+21,15,Sun,1991-12-08,W,Detroit Lions,,New York Jets,boxscore,34,20,336,1,286,5
+22,4,Sun,1995-09-24,W,Dallas Cowboys,,Arizona Cardinals,boxscore,34,20,440,1,381,3
+23,6,Sun,1998-10-11,W,Atlanta Falcons,@,New York Giants,boxscore,34,20,381,2,266,3
+24,17,Sun,2000-12-24,W,Baltimore Ravens,,New York Jets,boxscore,34,20,142,2,524,6
+25,10,Sun,2001-11-18,W,New Orleans Saints,,Indianapolis Colts,boxscore,34,20,378,0,339,1
+26,8,Sun,2004-10-31,W,Pittsburgh Steelers,,New England Patriots,boxscore,34,20,417,0,248,4
+27,5,Sun,2005-10-09,W,Tennessee Titans,@,Houston Texans,boxscore,34,20,310,0,257,1
+28,5,Sun,2006-10-08,W,San Francisco 49ers,,Oakland Raiders,boxscore,34,20,330,1,370,5
+29,13,Sun,2006-12-03,W,Arizona Cardinals,@,St. Louis Rams,boxscore,34,20,316,0,394,3
+30,11,Mon,2007-11-19,W,Denver Broncos,,Tennessee Titans,boxscore,34,20,359,1,423,3
+31,13,Sun,2007-12-02,W,Oakland Raiders,,Denver Broncos,boxscore,34,20,372,1,292,4
+32,10,Sun,2008-11-09,W,Atlanta Falcons,,New Orleans Saints,boxscore,34,20,361,0,521,3
+33,1,Sun,2009-09-13,W,Minnesota Vikings,@,Cleveland Browns,boxscore,34,20,310,0,268,2
+34,16,Sun,2010-12-26,W,Cincinnati Bengals,,San Diego Chargers,boxscore,34,20,371,1,313,2
+35,5,Sun,2013-10-06,W,St. Louis Rams,,Jacksonville Jaguars,boxscore,34,20,351,0,363,3
+36,14,Sun,2013-12-08,W,Philadelphia Eagles,,Detroit Lions,boxscore,34,20,478,1,231,3
+37,17,Sun,2013-12-29,W,New England Patriots,,Buffalo Bills,boxscore,34,20,382,1,393,0
+38,6,Sun,2015-10-18,W,New York Jets,,Washington Redskins,boxscore,34,20,474,3,225,2
+39,8,Sun,2015-11-01,W,Oakland Raiders,,New York Jets,boxscore,34,20,451,0,366,1
+40,8,Sun,2015-11-01,W,Arizona Cardinals,@,Cleveland Browns,boxscore,34,20,491,4,254,2
+41,13,Sun,2015-12-06,W,Kansas City Chiefs,@,Oakland Raiders,boxscore,34,20,232,2,361,3
+42,2,Sun,2016-09-18,W,Denver Broncos,,Indianapolis Colts,boxscore,34,20,400,1,253,2
+43,12,Sun,2017-11-26,W,Atlanta Falcons,,Tampa Bay Buccaneers,boxscore,34,20,516,1,373,0
+44,14,Sun,2018-12-09,W,Green Bay Packers,,Atlanta Falcons,boxscore,34,20,300,0,344,2
+45,1,Thu,2020-09-10,W,Kansas City Chiefs,,Houston Texans,boxscore,34,20,369,0,360,1
+46,3,Mon,2020-09-28,W,Kansas City Chiefs,@,Baltimore Ravens,boxscore,34,20,517,1,228,1
+47,3,Sun,2020-09-27,W,Cleveland Browns,,Washington Football Team,boxscore,34,20,300,0,309,5
+48,9,Sun,2020-11-08,W,Minnesota Vikings,,Detroit Lions,boxscore,34,20,487,0,421,3

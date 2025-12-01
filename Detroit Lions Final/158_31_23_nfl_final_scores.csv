@@ -1,0 +1,35 @@
+Rk,Week,Day,Date,,Winner/tie,,Loser/tie,,PtsW,PtsL,YdsW,TOW,YdsL,TOL
+1,13,Sun,1940-12-01,W,Chicago Bears,,Chicago Cardinals,boxscore,31,23,254,4,240,2
+2,10,Sun,1960-11-27,W,Philadelphia Eagles,,New York Giants,boxscore,31,23,211,3,337,5
+3,14,Sun,1960-12-11,W,Houston Oilers,,Buffalo Bills,boxscore,31,23,318,3,340,4
+4,5,Sun,1965-10-10,W,Kansas City Chiefs,@,Denver Broncos,boxscore,31,23,254,3,290,5
+5,7,Mon,1967-10-30,W,Green Bay Packers,@,St. Louis Cardinals,boxscore,31,23,246,2,405,2
+6,9,Sun,1976-11-07,W,Minnesota Vikings,,Detroit Lions,boxscore,31,23,430,4,399,1
+7,13,Sun,1985-12-01,W,Denver Broncos,@,Pittsburgh Steelers,boxscore,31,23,331,1,327,4
+8,15,Sun,1985-12-15,W,Indianapolis Colts,@,Tampa Bay Buccaneers,boxscore,31,23,384,1,387,4
+9,10,Sun,1989-11-12,W,Miami Dolphins,@,New York Jets,boxscore,31,23,447,3,410,3
+10,3,Sun,1994-09-18,W,New York Giants,,Washington Redskins,boxscore,31,23,337,0,456,2
+11,14,Sun,1995-12-03,W,Denver Broncos,,Jacksonville Jaguars,boxscore,31,23,397,3,260,2
+12,12,Sun,1996-11-17,W,Arizona Cardinals,,New York Giants,boxscore,31,23,347,3,331,4
+13,7,Sun,1998-10-18,W,Atlanta Falcons,,New Orleans Saints,boxscore,31,23,297,0,322,4
+14,1,Sun,2001-09-09,W,Miami Dolphins,@,Tennessee Titans,boxscore,31,23,307,2,315,3
+15,5,Sun,2001-10-14,W,Green Bay Packers,,Baltimore Ravens,boxscore,31,23,391,1,357,4
+16,1,Sun,2002-09-08,W,Washington Redskins,,Arizona Cardinals,boxscore,31,23,442,1,257,1
+17,11,Sun,2002-11-17,W,Tennessee Titans,,Pittsburgh Steelers,boxscore,31,23,378,1,357,3
+18,6,Sun,2005-10-16,W,Cincinnati Bengals,@,Tennessee Titans,boxscore,31,23,387,0,377,3
+19,17,Sun,2007-12-30,W,Carolina Panthers,@,Tampa Bay Buccaneers,boxscore,31,23,349,2,303,1
+20,10,Sun,2009-11-15,W,San Diego Chargers,,Philadelphia Eagles,boxscore,31,23,331,0,462,1
+21,3,Sun,2010-09-26,W,New York Jets,@,Miami Dolphins,boxscore,31,23,402,0,436,1
+22,14,Sun,2011-12-11,W,Atlanta Falcons,@,Carolina Panthers,boxscore,31,23,394,0,416,2
+23,9,Sun,2012-11-04,W,Denver Broncos,@,Cincinnati Bengals,boxscore,31,23,359,2,366,1
+24,13,Sun,2012-12-02,W,Denver Broncos,,Tampa Bay Buccaneers,boxscore,31,23,333,1,306,1
+25,7,Sun,2013-10-20,W,Atlanta Falcons,,Tampa Bay Buccaneers,boxscore,31,23,291,1,337,1
+26,1,Sun,2015-09-13,W,Green Bay Packers,@,Chicago Bears,boxscore,31,23,322,0,402,1
+27,15,Thu,2015-12-17,W,St. Louis Rams,,Tampa Bay Buccaneers,boxscore,31,23,319,0,509,2
+28,13,Sun,2016-12-04,W,Arizona Cardinals,,Washington Redskins,boxscore,31,23,369,0,333,2
+29,5,Sun,2018-10-07,W,Detroit Lions,,Green Bay Packers,boxscore,31,23,264,0,521,3
+30,12,Thu,2018-11-22,W,Dallas Cowboys,,Washington Redskins,boxscore,31,23,404,0,331,3
+31,4,Sun,2020-10-04,W,Minnesota Vikings,@,Houston Texans,boxscore,31,23,410,0,386,1
+32,4,Sun,2020-10-04,W,Seattle Seahawks,@,Miami Dolphins,boxscore,31,23,441,1,415,2
+33,Wild Card,Sat,2021-01-09,W,Tampa Bay Buccaneers,@,Washington Football Team,boxscore,31,23,507,1,375,1
+34,11,Sun,2022-11-20,W,Buffalo Bills,,Cleveland Browns,boxscore,31,23,357,0,396,1

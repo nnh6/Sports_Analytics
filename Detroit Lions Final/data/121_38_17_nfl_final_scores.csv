@@ -1,0 +1,46 @@
+Rk,Week,Day,Date,,Winner/tie,,Loser/tie,,PtsW,PtsL,YdsW,TOW,YdsL,TOL
+1,8,Sun,1945-11-11,W,Philadelphia Eagles,,New York Giants,boxscore,38,17,437,2,153,2
+2,12,Sun,1946-12-08,W,Los Angeles Rams,,Green Bay Packers,boxscore,38,17,318,3,227,4
+3,12,Sun,1961-12-03,W,Cleveland Browns,@,Dallas Cowboys,boxscore,38,17,373,3,376,6
+4,7,Sun,1963-10-20,W,San Diego Chargers,@,Kansas City Chiefs,boxscore,38,17,402,0,325,3
+5,3,Sun,1964-09-27,W,Houston Oilers,@,Denver Broncos,boxscore,38,17,436,2,371,4
+6,5,Sun,1964-10-11,W,Chicago Bears,,Los Angeles Rams,boxscore,38,17,328,0,263,6
+7,13,Sun,1967-12-10,W,Dallas Cowboys,,Philadelphia Eagles,boxscore,38,17,325,4,102,5
+8,11,Sun,1968-11-17,W,Houston Oilers,,Denver Broncos,boxscore,38,17,377,2,228,2
+9,9,Sun,1975-11-16,W,Oakland Raiders,,Cleveland Browns,boxscore,38,17,427,1,230,4
+10,1,Sun,1976-09-12,W,Cleveland Browns,,New York Jets,boxscore,38,17,390,1,258,2
+11,7,Sun,1983-10-16,W,Kansas City Chiefs,,New York Giants,boxscore,38,17,432,1,324,5
+12,8,Sun,1983-10-23,W,Washington Redskins,,Detroit Lions,boxscore,38,17,441,1,176,3
+13,9,Sun,1983-10-30,W,Detroit Lions,@,Chicago Bears,boxscore,38,17,396,0,382,4
+14,5,Mon,1984-10-01,W,Pittsburgh Steelers,,Cincinnati Bengals,boxscore,38,17,392,4,280,5
+15,14,Sun,1984-12-02,W,Seattle Seahawks,,Detroit Lions,boxscore,38,17,388,2,247,2
+16,5,Sun,1985-10-06,W,San Francisco 49ers,@,Atlanta Falcons,boxscore,38,17,499,0,386,2
+17,11,Sun,1986-11-16,W,Denver Broncos,,Kansas City Chiefs,boxscore,38,17,265,2,297,4
+18,12,Sun,1986-11-23,W,Detroit Lions,@,Tampa Bay Buccaneers,boxscore,38,17,393,2,380,4
+19,8,Sun,1990-10-28,W,Atlanta Falcons,,Cincinnati Bengals,boxscore,38,17,299,0,309,4
+20,13,Sun,1990-12-02,W,San Diego Chargers,,New York Jets,boxscore,38,17,409,1,352,3
+21,7,Sun,1992-10-18,W,Miami Dolphins,,New England Patriots,boxscore,38,17,387,3,273,1
+22,7,Sun,1992-10-18,W,Los Angeles Rams,,New York Giants,boxscore,38,17,356,1,296,2
+23,15,Sun,1998-12-13,W,Seattle Seahawks,,San Diego Chargers,boxscore,38,17,238,3,277,8
+24,2,Sun,2001-09-23,W,Denver Broncos,@,Arizona Cardinals,boxscore,38,17,381,0,308,3
+25,6,Sun,2001-10-21,W,New England Patriots,@,Indianapolis Colts,boxscore,38,17,385,0,484,2
+26,12,Mon,2002-11-25,W,Philadelphia Eagles,@,San Francisco 49ers,boxscore,38,17,343,0,409,0
+27,2,Sun,2003-09-14,W,Buffalo Bills,@,Jacksonville Jaguars,boxscore,38,17,371,0,287,0
+28,6,Sun,2003-10-12,W,Tennessee Titans,,Houston Texans,boxscore,38,17,535,1,458,3
+29,4,Sun,2004-10-03,W,San Diego Chargers,,Tennessee Titans,boxscore,38,17,393,0,330,0
+30,7,Sun,2005-10-23,W,Oakland Raiders,,Buffalo Bills,boxscore,38,17,416,1,210,1
+31,9,Sun,2007-11-04,W,Dallas Cowboys,@,Philadelphia Eagles,boxscore,38,17,434,1,316,3
+32,14,Sun,2007-12-09,W,Buffalo Bills,,Miami Dolphins,boxscore,38,17,389,1,285,5
+33,1,Sun,2008-09-07,W,Pittsburgh Steelers,,Houston Texans,boxscore,38,17,305,1,234,3
+34,8,Sun,2009-11-01,W,Dallas Cowboys,,Seattle Seahawks,boxscore,38,17,362,1,308,2
+35,12,Mon,2009-11-30,W,New Orleans Saints,,New England Patriots,boxscore,38,17,480,1,366,3
+36,5,Sun,2011-10-09,W,Pittsburgh Steelers,,Tennessee Titans,boxscore,38,17,431,1,306,1
+37,11,Sun,2012-11-18,W,New Orleans Saints,@,Oakland Raiders,boxscore,38,17,380,0,404,2
+38,4,Mon,2013-09-30,W,New Orleans Saints,,Miami Dolphins,boxscore,38,17,465,1,331,4
+39,4,Sun,2014-09-28,W,Green Bay Packers,@,Chicago Bears,boxscore,38,17,358,0,496,2
+40,4,Sun,2014-09-28,W,Dallas Cowboys,,New Orleans Saints,boxscore,38,17,445,0,438,3
+41,7,Sun,2014-10-19,W,Green Bay Packers,,Carolina Panthers,boxscore,38,17,363,0,331,1
+42,10,Sun,2014-11-09,W,Seattle Seahawks,,New York Giants,boxscore,38,17,510,3,324,2
+43,15,Sun,2015-12-20,W,Minnesota Vikings,,Chicago Bears,boxscore,38,17,350,0,293,2
+44,16,Sat,2016-12-24,W,Jacksonville Jaguars,,Tennessee Titans,boxscore,38,17,415,1,263,1
+45,15,Sun,2019-12-15,W,Tampa Bay Buccaneers,@,Detroit Lions,boxscore,38,17,495,1,295,3

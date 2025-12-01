@@ -1,0 +1,847 @@
+---
+title: "nnh6_stats1341_Final"
+author: "Nnh6"
+date: "2022-12-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+There are some methods that are "muted" but show my earlier thought process and the foundation to the final methods used. 
+
+#Set Up
+Download Libraries to use.
+```{r}
+library(tidyverse)
+library(ggplot2)
+library( plyr )
+```
+
+
+##Data Collection & Data Cleaning
+Iterate through all the csv files and concatenate them together into the same df. (Combine multiple data sets)
+Note: All the csv files need to be in the same folder as this R markdown file to be loaded.
+```{r}
+final_scores_complete <- ldply( .data = list.files(pattern="*.csv"),
+                    .fun = read.csv,
+                    header = TRUE)
+```
+
+Removing extraneous variables
+Doing this by creating a new data frame that is a subset of the original one containing only the columns I need.
+```{r}
+keep <- c("Winner.tie", "Loser.tie", "PtsW", "PtsL")
+final_scores_sub <- final_scores_complete[keep]
+```
+
+I will be adding in the seasons by extracting the years and months from the date variable to use for filtering later.
+```{r}
+final_scores_sub$year <- substr(final_scores_complete$Date,1,4)
+
+final_scores_sub$month <- substr(final_scores_complete$Date,6,7)
+```
+
+For the Bradley-Terry Model, I will need to determine which team is the home team. I ended up not using the model.
+```{r, eval=FALSE, echo=FALSE}
+final_scores_sub$Lhome <- ifelse(final_scores_complete$X.1 == "@", 1, 0)
+final_scores_sub$neutral <- ifelse(final_scores_complete$X.1 == "N", 1, 0)
+```
+
+Creating a Data frame of active NFL team names for filtering later.
+```{r}
+active_teams <- read.csv("active_nfl_teams.csv", TRUE, ",")
+glimpse(active_teams)
+```
+
+
+#Remove incomplete observations
+
+Checking for any missing observations
+```{r, eval=FALSE, echo=FALSE}
+count(final_scores_sub$Winner.tie)
+count(final_scores_sub$Loser.tie)
+count(final_scores_sub$PtsW)
+count(final_scores_sub$PtsL)
+count(final_scores_sub$year)
+```
+Since I was able to determine that there were Incomplete observations (containing NA value), I will remove them.
+
+Removing incomplete observations
+```{r}
+final_scores <- na.omit(final_scores_sub)
+```
+
+#Read in data for: Pythagorean Win Percentages
+
+This disabled chunk is the initial start to finding the Pythagorean Win Percentage for the Detroit Lions alone. It goes through all Detroit Lions games in history. It collects how many games allowed, and how many points gotten.
+```{r, eval=FALSE, echo=FALSE}
+pts_scored = 0
+pts_allowed = 0
+
+for(i in 1:nrow(final_scores)) {       # for-loop over rows
+  
+   if(identical(final_scores$Winner.tie[i],"Detroit Lions")){ #if win
+    
+      pts_allowed = pts_allowed + final_scores$PtsL[i]
+      pts_scored = pts_scored + final_scores$PtsW[i]
+    
+  } else if(identical(final_scores$Loser.tie[i], "Detroit Lions")) {    #if loss
+      
+      pts_allowed = pts_allowed + final_scores$PtsW[i]
+      pts_scored = pts_scored + final_scores$PtsL[i]
+      
+  }
+  #if tie add it anyways
+}
+
+pts_allowed
+pts_scored
+pts_scored/(pts_scored+pts_allowed)
+
+```
+However, since I wanted to compare the Detroit Lions to the rest of the NFL league, I will need to take a different approach. 
+
+##Setting up the Data: Whole NFL History
+
+#Over Whole NFL History, all teams
+
+Initializing a data frame to keep track of values.
+```{r}
+pwp_df_whole <- data.frame(matrix(ncol = 6, nrow = 0))
+
+colnames(pwp_df_whole) <- c('team_name', 'pts_scored', 'pts_allowed', 'total_wins', 'total_losses', 'total_games')
+```
+
+These are the loops that collects and sorts the values needed to calculate the Pythagorean Win Percentages.
+I initially tried to run it in such a way where I would only need to go through one run over the data but it was having issues so I set them into 2 different loops.
+
+Loop through Winners.
+```{r}
+for(i in 1:nrow(final_scores)) {       # for-loop over rows
+    #once for winner
+  if(sum(str_detect(pwp_df_whole$team_name, final_scores$Winner.tie[i])) <= 0){ #if this team is not already in the dataframe add them into a new row
+   pwp_df_whole[nrow(pwp_df_whole) + 1,] <- c(final_scores$Winner.tie[i], final_scores$PtsW[i], final_scores$PtsL[i], 1, 0, 1)
+           
+  } else { #case if team is already in thepwp_df_whole
+    
+    #get the row index of the team name
+    #possible alternate method: which(grepl(12345, df$colname))
+    index = which(pwp_df_whole$team_name == final_scores$Winner.tie[i])
+    
+    #adjust points scored
+   pwp_df_whole[index, 2] = strtoi(pwp_df_whole[index, 2]) + final_scores$PtsW[i]
+    
+    #adjust points allowed
+   pwp_df_whole[index, 3] = strtoi(pwp_df_whole[index, 3]) + final_scores$PtsL[i]
+    
+    #adjusting total wins
+   pwp_df_whole[index, 4] = strtoi(pwp_df_whole[index, 4]) + 1
+    
+    #adjust games total games
+   pwp_df_whole[index, 6] = strtoi(pwp_df_whole[index, 6]) + 1
+  }
+}
+```
+
+Loop through Losers
+```{r}
+for(i in 1:nrow(final_scores)) { 
+  
+    #once for the loser
+  if(sum(str_detect(pwp_df_whole$team_name, final_scores$Loser.tie[i])) <= 0){ #if this team is not already in the dataframe add them into a new row
+   pwp_df_whole[nrow(pwp_df_whole) + 1,] <- c(final_scores$Loser.tie[i], final_scores$PtsL[i], final_scores$PtsW[i], 0, 1, 1)
+           
+  } else { #case if team is already in thepwp_df_whole
+    
+    #get the row index of the team name
+    #possible alternate method: which(grepl(12345, df$colname))
+    index = which(pwp_df_whole$team_name == final_scores$Loser.tie[i])
+    
+    #adjust points scored
+   pwp_df_whole[index, 2] = strtoi(pwp_df_whole[index, 2]) + final_scores$PtsL[i]
+    
+    #adjust points allowed
+   pwp_df_whole[index, 3] = strtoi(pwp_df_whole[index, 3]) + final_scores$PtsW[i]
+    
+    #adjust games total losses
+   pwp_df_whole[index, 5] = strtoi(pwp_df_whole[index, 5]) + 1
+    
+    #adjust games total games
+   pwp_df_whole[index, 6] = strtoi(pwp_df_whole[index, 6]) + 1
+  }
+
+  
+  #if there is a tie, we will treat it the same.
+}
+```
+
+#For whole NFL history, only currently active teams
+Removing inactive teams. Only Currently Active teams' Whole History
+
+```{r}
+pwp_df_whole_active <- data.frame(matrix(ncol = 6, nrow = 0))
+
+colnames(pwp_df_whole_active) <- c('team_name', 'pts_scored', 'pts_allowed', 'total_wins', 'total_losses', 'total_games')
+
+for(i in 1:nrow(pwp_df_whole)) {
+  
+  if(any(active_teams==pwp_df_whole$team_name[i])){ 
+    #if the team name is contained in the active name list, add that row into the new data frame
+    
+    pwp_df_whole_active[nrow(pwp_df_whole_active) + 1,] <- c(pwp_df_whole$team_name[i], pwp_df_whole$pts_scored[i], pwp_df_whole$pts_allowed[i], pwp_df_whole$total_wins[i], pwp_df_whole$total_losses[i], pwp_df_whole$total_games[i])
+     
+  }
+}
+```
+
+```{r}
+#for all teams
+pwp_df_whole$actual_wp <- strtoi(pwp_df_whole$total_wins) / (strtoi(pwp_df_whole$total_wins) + strtoi(pwp_df_whole$total_losses))
+
+#for only currently active teams
+pwp_df_whole_active$actual_wp <- strtoi(pwp_df_whole_active$total_wins) / (strtoi(pwp_df_whole_active$total_wins) + strtoi(pwp_df_whole_active$total_losses))
+```
+
+
+##Setting up the Data: only Post Super Bowl NFL History
+
+Same as earlier but with a new condition of only retaining records from after the 1966-1967 first ever Super Bowl season. 
+```{r}
+final_scores_sub$psb <- ifelse(strtoi(substr(final_scores_complete$Date,1,4)) >= 1966 & strtoi(substr(final_scores_complete$Date,6,7)) >= 5,substr(final_scores_complete$Date,1,4), NA) 
+#After Summer 1966 because it's the season leading up to the first superbowl in Jan 1967
+
+final_scores_sub <- na.omit(final_scores_sub)
+```
+
+#All NFL teams since 1967 Super Bowl Season
+
+Initializing a data frame to keep track of values.
+```{r}
+pwp_df_psb <- data.frame(matrix(ncol = 6, nrow = 0))
+
+colnames(pwp_df_psb) <- c('team_name', 'pts_scored', 'pts_allowed', 'total_wins', 'total_losses', 'total_games')
+```
+
+
+Loop through Winners.
+```{r}
+for(i in 1:nrow(final_scores_sub)) {       # for-loop over rows
+    #once for winner
+  if(sum(str_detect(pwp_df_psb$team_name, final_scores_sub$Winner.tie[i])) <= 0){ #if this team is not already in the dataframe add them into a new row
+   pwp_df_psb[nrow(pwp_df_psb) + 1,] <- c(final_scores_sub$Winner.tie[i], final_scores_sub$PtsW[i], final_scores_sub$PtsL[i], 1, 0, 1)
+           
+  } else { #case if team is already in thepwp_df_psb
+    
+    #get the row index of the team name
+    #possible alternate method: which(grepl(12345, df$colname))
+    index = which(pwp_df_psb$team_name == final_scores_sub$Winner.tie[i])
+    
+    #adjust points scored
+   pwp_df_psb[index, 2] = strtoi(pwp_df_psb[index, 2]) + final_scores_sub$PtsW[i]
+    
+    #adjust points allowed
+   pwp_df_psb[index, 3] = strtoi(pwp_df_psb[index, 3]) + final_scores_sub$PtsL[i]
+    
+    #adjusting total wins
+   pwp_df_psb[index, 4] = strtoi(pwp_df_psb[index, 4]) + 1
+    
+    #adjust games total games
+   pwp_df_psb[index, 6] = strtoi(pwp_df_psb[index, 6]) + 1
+  }
+}
+```
+
+Loop through Losers
+```{r}
+for(i in 1:nrow(final_scores_sub)) { 
+  
+    #once for the loser
+  if(sum(str_detect(pwp_df_psb$team_name, final_scores_sub$Loser.tie[i])) <= 0){ #if this team is not already in the dataframe add them into a new row
+   pwp_df_psb[nrow(pwp_df_psb) + 1,] <- c(final_scores_sub$Loser.tie[i], final_scores_sub$PtsL[i], final_scores_sub$PtsW[i], 0, 1, 1)
+           
+  } else { #case if team is already in thepwp_df_psb
+    
+    #get the row index of the team name
+    #possible alternate method: which(grepl(12345, df$colname))
+    index = which(pwp_df_psb$team_name == final_scores_sub$Loser.tie[i])
+    
+    #adjust points scored
+   pwp_df_psb[index, 2] = strtoi(pwp_df_psb[index, 2]) + final_scores_sub$PtsL[i]
+    
+    #adjust points allowed
+   pwp_df_psb[index, 3] = strtoi(pwp_df_psb[index, 3]) + final_scores_sub$PtsW[i]
+    
+    #adjust games total losses
+   pwp_df_psb[index, 5] = strtoi(pwp_df_psb[index, 5]) + 1
+    
+    #adjust games total games
+   pwp_df_psb[index, 6] = strtoi(pwp_df_psb[index, 6]) + 1
+  }
+
+  #if there is a tie, we will treat it the same.
+}
+```
+
+
+
+#Only currently active NFL teams since 1967 Super Bowl Season
+```{r}
+pwp_df_psb_active <- data.frame(matrix(ncol = 6, nrow = 0))
+
+colnames(pwp_df_psb_active) <- c('team_name', 'pts_scored', 'pts_allowed', 'total_wins', 'total_losses', 'total_games')
+
+for(i in 1:nrow(pwp_df_psb)) {
+  
+  if(any(active_teams==pwp_df_psb$team_name[i])){ 
+    #if the team name is contained in the active name list, add that row into the new data frame
+    
+    pwp_df_psb_active[nrow(pwp_df_psb_active) + 1,] <- c(pwp_df_psb$team_name[i], pwp_df_psb$pts_scored[i], pwp_df_psb$pts_allowed[i], pwp_df_psb$total_wins[i], pwp_df_psb$total_losses[i], pwp_df_psb$total_games[i])
+     
+  }
+}
+```
+
+```{r}
+#for all teams
+pwp_df_psb$actual_wp <- strtoi(pwp_df_psb$total_wins) / (strtoi(pwp_df_psb$total_wins) + strtoi(pwp_df_psb$total_losses))
+
+#for currently active teams
+pwp_df_psb_active$actual_wp <- strtoi(pwp_df_psb_active$total_wins) / (strtoi(pwp_df_psb_active$total_wins) + strtoi(pwp_df_psb_active$total_losses))
+```
+
+To prevent NaN from divisions by 0, remove any observations where both points scored and allowed are 0.
+```{r}
+pwp_df_whole <- pwp_df_whole[-which(pwp_df_whole$pts_scored == 0 & pwp_df_whole$pts_allowed == 0),]
+```
+
+
+##Descriptive Statistics: Pythagorean Win Percentages
+
+Finding the Optimal Pythagorean Exponent. Code to calculate optimal Pythagorean coefficient (from Homework 7)
+
+#Whole History, All Teams
+For whole
+```{r}
+# Initialize matrix to store exponents, increments, RMSEs, and correlations
+results_whole = matrix(0, nrow = 0, ncol = 4)
+colnames(results_whole) = c("exponent", "increment", "RMSE", "correlation")
+
+# Initialize starting values for exponent, increment, and the best RMSE
+exponent = 1
+increment = 1
+best_RMSE = 162
+
+# Continue to find a better exponent until the amount we change the exponent by falls below 0.01
+while(abs(increment) > 0.01) {
+  # Save Pythagorean wins, calculate the error between actual and Pythagorean, and find the RMSE
+  pyth_wins = strtoi(pwp_df_whole$total_games) * (strtoi(pwp_df_whole$pts_scored)^exponent / (strtoi(pwp_df_whole$pts_scored)^exponent + strtoi(pwp_df_whole$pts_allowed)^exponent))
+  
+  RMSE = sqrt(sum((strtoi(pwp_df_whole$total_wins) - pyth_wins)^2)/nrow(pwp_df_whole))
+
+  # Save current exponent, increment, RMSE, and correlation for current iteration
+  correlation = cor(strtoi(pwp_df_whole$total_wins)/strtoi(pwp_df_whole$total_games), pyth_wins/strtoi(pwp_df_whole$total_games))
+  results_whole = rbind(results_whole, c(exponent, increment, RMSE, correlation))
+
+  if(RMSE < best_RMSE) {  # If using current exponent gives us the best current RMSE, update RMSE and exponent
+    best_RMSE = RMSE
+    best_exponent = exponent
+    exponent = exponent + increment  # Increment/decrement the exponent by some amount
+  } else {  # If using current exponent gives us a worse RMSE, move in the other direction
+    exponent = exponent - 1.5*increment
+    increment = -0.5*increment
+  }
+}
+
+results_whole  = data.frame(results_whole)
+```
+
+Checking results_whole
+```{r, eval=FALSE, echo=FALSE}
+glimpse(results_whole)
+
+results_whole %>%
+  ggplot(mapping = aes(x = exponent, y = RMSE)) +
+  geom_point()
+```
+
+Finding the best exponent (the one with the lowest RMSE)
+```{r}
+results_whole[which(results_whole$RMSE == min(results_whole$RMSE), arr.ind = TRUE),]
+```
+
+Calculate PWP
+```{r}
+best_exponent = 2.21875 #lowest RMSE of 7.281147
+
+#calculate the pythagorean winning percentage using points scored and points allowed
+pwp_df_whole$pwp <- I(strtoi(pwp_df_whole$pts_scored)^best_exponent)/(I(strtoi(pwp_df_whole$pts_scored)^best_exponent) + I(strtoi(pwp_df_whole$pts_allowed)^best_exponent))
+
+#calculate the error between actual and pythagorean win percentages
+pwp_df_whole$error <- as.double(pwp_df_whole$actual_wp) - as.double(pwp_df_whole$pwp)
+```
+
+#Whole History, Active Teams
+```{r}
+# Initialize matrix to store exponents, increments, RMSEs, and correlations
+results_whole_active = matrix(0, nrow = 0, ncol = 4)
+colnames(results_whole_active) = c("exponent", "increment", "RMSE", "correlation")
+
+# Initialize starting values for exponent, increment, and the best RMSE
+exponent = 1
+increment = 1
+best_RMSE = 162
+
+# Continue to find a better exponent until the amount we change the exponent by falls below 0.01
+while(abs(increment) > 0.01) {
+  # Save Pythagorean wins, calculate the error between actual and Pythagorean, and find the RMSE
+  pyth_wins = strtoi(pwp_df_whole_active$total_games) * (strtoi(pwp_df_whole_active$pts_scored)^exponent / (strtoi(pwp_df_whole_active$pts_scored)^exponent + strtoi(pwp_df_whole_active$pts_allowed)^exponent))
+  RMSE = sqrt(sum((strtoi(pwp_df_whole_active$total_wins) - pyth_wins)^2)/nrow(pwp_df_whole_active))
+
+  # Save current exponent, increment, RMSE, and correlation for current iteration
+  correlation = cor(strtoi(pwp_df_whole_active$total_wins)/strtoi(pwp_df_whole_active$total_games), pyth_wins/strtoi(pwp_df_whole_active$total_games))
+  results_whole_active = rbind(results_whole_active, c(exponent, increment, RMSE, correlation))
+
+  if(RMSE < best_RMSE) {  # If using current exponent gives us the best current RMSE, update RMSE and exponent
+    best_RMSE = RMSE
+    best_exponent = exponent
+    exponent = exponent + increment  # Increment/decrement the exponent by some amount
+  } else {  # If using current exponent gives us a worse RMSE, move in the other direction
+    exponent = exponent - 1.5*increment
+    increment = -0.5*increment
+  }
+}
+
+results_whole_active  = data.frame(results_whole_active)
+```
+
+Checking results_whole_active
+```{r, eval=FALSE, echo=FALSE}
+glimpse(results_whole_active)
+
+results_whole_active %>%
+  ggplot(mapping = aes(x = exponent, y = RMSE)) +
+  geom_point()
+```
+
+Finding the best exponent (the one with the lowest RMSE)
+```{r}
+results_whole_active[which(results_whole_active$RMSE == min(results_whole_active$RMSE), arr.ind = TRUE),]
+```
+Calculate PWP
+```{r}
+best_exponent = 2.28125 #lowest RMSE of 12.54606
+
+#calculate the pythagorean winning percentage using points scored and points allowed
+pwp_df_whole_active$pwp <- I(strtoi(pwp_df_whole_active$pts_scored)^best_exponent)/(I(strtoi(pwp_df_whole_active$pts_scored)^best_exponent) + I(strtoi(pwp_df_whole_active$pts_allowed)^best_exponent))
+
+#calculate the error between actual and pythagorean win percentages
+pwp_df_whole_active$error <- as.double(pwp_df_whole_active$actual_wp) - as.double(pwp_df_whole_active$pwp)
+```
+
+#Post Super Bowl, All Teams
+
+```{r}
+# Initialize matrix to store exponents, increments, RMSEs, and correlations
+results_psb = matrix(0, nrow = 0, ncol = 4)
+colnames(results_psb) = c("exponent", "increment", "RMSE", "correlation")
+
+# Initialize starting values for exponent, increment, and the best RMSE
+exponent = 1
+increment = 1
+best_RMSE = 162
+
+# Continue to find a better exponent until the amount we change the exponent by falls below 0.01
+while(abs(increment) > 0.01) {
+  # Save Pythagorean wins, calculate the error between actual and Pythagorean, and find the RMSE
+  pyth_wins = strtoi(pwp_df_psb$total_games) * (strtoi(pwp_df_psb$pts_scored)^exponent / (strtoi(pwp_df_psb$pts_scored)^exponent + strtoi(pwp_df_psb$pts_allowed)^exponent))
+  RMSE = sqrt(sum((strtoi(pwp_df_psb$total_wins) - pyth_wins)^2)/nrow(pwp_df_psb))
+
+  # Save current exponent, increment, RMSE, and correlation for current iteration
+  correlation = cor(strtoi(pwp_df_psb$total_wins)/strtoi(pwp_df_psb$total_games), pyth_wins/strtoi(pwp_df_psb$total_games))
+  results_psb = rbind(results_psb, c(exponent, increment, RMSE, correlation))
+
+  if(RMSE < best_RMSE) {  # If using current exponent gives us the best current RMSE, update RMSE and exponent
+    best_RMSE = RMSE
+    best_exponent = exponent
+    exponent = exponent + increment  # Increment/decrement the exponent by some amount
+  } else {  # If using current exponent gives us a worse RMSE, move in the other direction
+    exponent = exponent - 1.5*increment
+    increment = -0.5*increment
+  }
+}
+
+results_psb  = data.frame(results_psb)
+```
+
+Checking results_psb
+```{r, eval=FALSE, echo=FALSE}
+glimpse(results_psb)
+
+results_psb %>%
+  ggplot(mapping = aes(x = exponent, y = RMSE)) +
+  geom_point()
+```
+
+Finding the best exponent (the one with the lowest RMSE)
+```{r}
+results_psb[which(results_psb$RMSE == min(results_psb$RMSE), arr.ind = TRUE),]
+```
+
+Calculate PWP
+```{r}
+best_exponent = 2.375 #lowest RMSE of 7.544588
+
+#calculate the pythagorean winning percentage using points scored and points allowed
+pwp_df_psb$pwp <- I(strtoi(pwp_df_psb$pts_scored)^best_exponent)/(I(strtoi(pwp_df_psb$pts_scored)^best_exponent) + I(strtoi(pwp_df_psb$pts_allowed)^best_exponent))
+
+#calculate the error between actual and pythagorean win percentages
+pwp_df_psb$error <- as.double(pwp_df_psb$actual_wp) - as.double(pwp_df_psb$pwp)
+```
+
+#Post Super Bowl, Active Teams
+For whole
+```{r}
+# Initialize matrix to store exponents, increments, RMSEs, and correlations
+results_psb_active = matrix(0, nrow = 0, ncol = 4)
+colnames(results_psb_active) = c("exponent", "increment", "RMSE", "correlation")
+
+# Initialize starting values for exponent, increment, and the best RMSE
+exponent = 1
+increment = 1
+best_RMSE = 162
+
+# Continue to find a better exponent until the amount we change the exponent by falls below 0.01
+while(abs(increment) > 0.01) {
+  # Save Pythagorean wins, calculate the error between actual and Pythagorean, and find the RMSE
+  pyth_wins = strtoi(pwp_df_psb_active$total_games) * (strtoi(pwp_df_psb_active$pts_scored)^exponent / (strtoi(pwp_df_psb_active$pts_scored)^exponent + strtoi(pwp_df_psb_active$pts_allowed)^exponent))
+  RMSE = sqrt(sum((strtoi(pwp_df_psb_active$total_wins) - pyth_wins)^2)/nrow(pwp_df_psb_active))
+
+  # Save current exponent, increment, RMSE, and correlation for current iteration
+  correlation = cor(strtoi(pwp_df_psb_active$total_wins)/strtoi(pwp_df_psb_active$total_games), pyth_wins/strtoi(pwp_df_psb_active$total_games))
+  results_psb_active = rbind(results_psb_active, c(exponent, increment, RMSE, correlation))
+
+  if(RMSE < best_RMSE) {  # If using current exponent gives us the best current RMSE, update RMSE and exponent
+    best_RMSE = RMSE
+    best_exponent = exponent
+    exponent = exponent + increment  # Increment/decrement the exponent by some amount
+  } else {  # If using current exponent gives us a worse RMSE, move in the other direction
+    exponent = exponent - 1.5*increment
+    increment = -0.5*increment
+  }
+}
+
+results_psb_active  = data.frame(results_psb_active)
+```
+
+Checking results_psb_active
+```{r, eval=FALSE, echo=FALSE}
+glimpse(results_psb_active)
+
+results_psb_active %>%
+  ggplot(mapping = aes(x = exponent, y = RMSE)) +
+  geom_point()
+```
+
+Finding the best exponent (the one with the lowest RMSE)
+```{r}
+results_psb_active[which(results_psb_active$RMSE == min(results_psb_active$RMSE), arr.ind = TRUE),]
+```
+Calculate PWP
+```{r}
+best_exponent = 2.375 #lowest RMSE of 7.864212
+
+#calculate the pythagorean winning percentage using points scored and points allowed
+pwp_df_psb_active$pwp <- I(strtoi(pwp_df_psb_active$pts_scored)^best_exponent)/(I(strtoi(pwp_df_psb_active$pts_scored)^best_exponent) + I(strtoi(pwp_df_psb_active$pts_allowed)^best_exponent))
+
+#calculate the error between actual and pythagorean win percentages
+pwp_df_psb_active$error <- as.double(pwp_df_psb_active$actual_wp) - as.double(pwp_df_psb_active$pwp)
+```
+
+#Bradley-Terry Models
+Exploring the possibility of using this model on this data. 
+
+This data set has many ties which means this model won't work at it's best. (About 2% of the data are ties...)
+```{r}
+sum(count(which(final_scores$PtsW == final_scores$PtsL))$freq)
+
+sum(count(which(final_scores$PtsW == final_scores$PtsL))$freq)/nrow(final_scores)
+```
+
+For simplicity and clarity, removing inactive teams.
+```{r}
+btm_df_active <- data.frame(matrix(ncol = 6, nrow = 0))
+
+colnames(btm_df_active) <- c('team_name', 'pts_scored', 'pts_allowed', 'total_wins', 'total_losses', 'total_games')
+
+for(i in 1:nrow(pwp_df_whole)) {
+  
+  if(any(active_teams==pwp_df_whole$team_name[i])){ 
+    #if the team name is contained in the active name list, add that row into the new data frame
+    
+     btm_df_active[nrow(btm_df_active) + 1,] <- c(pwp_df_whole$team_name[i], pwp_df_whole$pts_scored[i], pwp_df_whole$pts_allowed[i], pwp_df_whole$total_wins[i], pwp_df_whole$total_losses[i], pwp_df_whole$total_games[i])
+     
+  }
+}
+```
+
+The scores seem pretty normal.
+```{r}
+#create a histogram
+hist(strtoi(btm_df_active$pts_scored), xlab = "pts scored", breaks = 10)
+```
+
+At this point, I realized that a Bradley-Terry Model may not be the best approach to answering the focus question. 
+
+##Exploring the data
+Focusing on the 4 different Pythagorean Win Percentages. Let's make different graphs to see what I can learn from them
+
+#Histograms
+
+Distribution of Total Games
+```{r}
+hist(strtoi(pwp_df_whole$total_games))
+hist(strtoi(pwp_df_whole_active$total_games))
+hist(strtoi(pwp_df_psb$total_games))
+hist(strtoi(pwp_df_psb_active$total_games))
+```
+
+Distribution of Points Scored
+```{r}
+hist(strtoi(pwp_df_whole$pts_scored))
+hist(strtoi(pwp_df_whole_active$pts_scored))
+hist(strtoi(pwp_df_psb$pts_scored))
+hist(strtoi(pwp_df_psb_active$pts_scored))
+```
+
+Distribution of Points Allowed
+```{r}
+hist(strtoi(pwp_df_whole$pts_allowed))
+hist(strtoi(pwp_df_whole_active$pts_allowed))
+hist(strtoi(pwp_df_psb$pts_allowed))
+hist(strtoi(pwp_df_psb_active$pts_allowed))
+```
+Distribution of Total Wins
+```{r}
+hist(strtoi(pwp_df_whole$total_wins))
+hist(strtoi(pwp_df_whole_active$total_wins))
+hist(strtoi(pwp_df_psb$total_wins))
+hist(strtoi(pwp_df_psb_active$total_wins))
+```
+Distribution of Total Losses
+```{r}
+hist(strtoi(pwp_df_whole$total_losses))
+hist(strtoi(pwp_df_whole_active$total_losses))
+hist(strtoi(pwp_df_psb$total_losses))
+hist(strtoi(pwp_df_psb_active$total_losses))
+```
+
+Distribution of Actual Win Percentages
+```{r}
+hist(as.double(pwp_df_whole$actual_wp))
+hist(as.double(pwp_df_whole_active$actual_wp))
+hist(as.double(pwp_df_psb$actual_wp))
+hist(as.double(pwp_df_psb_active$actual_wp))
+```
+Distribution of PWP
+```{r}
+#create a histogram of errors
+hist(as.double(pwp_df_whole$pwp))
+hist(as.double(pwp_df_whole_active$pwp))
+hist(as.double(pwp_df_psb$pwp))
+hist(as.double(pwp_df_psb_active$pwp))
+```
+
+Distribution of Errors/Residuals
+```{r}
+#create a histogram of errors
+hist(as.double(pwp_df_whole$error))
+hist(as.double(pwp_df_whole_active$error))
+hist(as.double(pwp_df_psb$error))
+hist(as.double(pwp_df_psb_active$error))
+```
+
+#Summaries
+```{r}
+#changing class types for summary
+pwp_df_whole$pts_scored <- as.integer(pwp_df_whole$pts_scored)
+pwp_df_whole$pts_allowed <- as.integer(pwp_df_whole$pts_allowed)
+pwp_df_whole$total_wins <- as.integer(pwp_df_whole$total_wins)
+pwp_df_whole$total_losses <- as.integer(pwp_df_whole$total_losses)
+pwp_df_whole$total_games <- as.integer(pwp_df_whole$total_games)
+
+summary(pwp_df_whole)
+```
+```{r}
+#changing class types for summary
+pwp_df_whole_active$pts_scored <- as.integer(pwp_df_whole_active$pts_scored)
+pwp_df_whole_active$pts_allowed <- as.integer(pwp_df_whole_active$pts_allowed)
+pwp_df_whole_active$total_wins <- as.integer(pwp_df_whole_active$total_wins)
+pwp_df_whole_active$total_losses <- as.integer(pwp_df_whole_active$total_losses)
+pwp_df_whole_active$total_games <- as.integer(pwp_df_whole_active$total_games)
+
+summary(pwp_df_whole_active)
+```
+```{r}
+#changing class types for summary
+pwp_df_psb$pts_scored <- as.integer(pwp_df_psb$pts_scored)
+pwp_df_psb$pts_allowed <- as.integer(pwp_df_psb$pts_allowed)
+pwp_df_psb$total_wins <- as.integer(pwp_df_psb$total_wins)
+pwp_df_psb$total_losses <- as.integer(pwp_df_psb$total_losses)
+pwp_df_psb$total_games <- as.integer(pwp_df_psb$total_games)
+
+summary(pwp_df_psb)
+```
+```{r}
+#changing class types for summary
+pwp_df_psb_active$pts_scored <- as.integer(pwp_df_psb_active$pts_scored)
+pwp_df_psb_active$pts_allowed <- as.integer(pwp_df_psb_active$pts_allowed)
+pwp_df_psb_active$total_wins <- as.integer(pwp_df_psb_active$total_wins)
+pwp_df_psb_active$total_losses <- as.integer(pwp_df_psb_active$total_losses)
+pwp_df_psb_active$total_games <- as.integer(pwp_df_psb_active$total_games)
+
+summary(pwp_df_psb_active)
+```
+#Boxplots
+
+PWP
+```{r}
+boxplot(pwp_df_psb$pwp)
+boxplot(pwp_df_psb_active$pwp)
+boxplot(pwp_df_whole$pwp)
+boxplot(pwp_df_whole_active$pwp)
+```
+Actual Win Percentage
+```{r}
+boxplot(pwp_df_psb$actual_wp)
+boxplot(pwp_df_psb_active$actual_wp)
+boxplot(pwp_df_whole$actual_wp)
+boxplot(pwp_df_whole_active$actual_wp)
+```
+Errors
+```{r}
+boxplot(pwp_df_psb$error)
+boxplot(pwp_df_psb_active$error)
+boxplot(pwp_df_whole$error)
+boxplot(pwp_df_whole_active$error)
+```
+
+#Means and SD of the error
+```{r}
+#print mean and standard deviation of the errors
+mean(pwp_df_whole$error)
+sd(pwp_df_whole$error)
+```
+```{r}
+#print mean and standard deviation of the errors
+mean(pwp_df_whole_active$error)
+sd(pwp_df_whole_active$error)
+```
+```{r}
+#print mean and standard deviation of the errors
+mean(pwp_df_psb$error)
+sd(pwp_df_psb$error)
+```
+```{r}
+#print mean and standard deviation of the errors
+mean(pwp_df_psb_active$error)
+sd(pwp_df_psb_active$error)
+```
+
+#Means and SD of the PWP
+```{r}
+#print mean and standard deviation of the pwps
+mean(pwp_df_whole$pwp)
+sd(pwp_df_whole$pwp)
+```
+```{r}
+#print mean and standard deviation of the pwps
+mean(pwp_df_whole_active$pwp)
+sd(pwp_df_whole_active$pwp)
+```
+```{r}
+#print mean and standard deviation of the pwps
+mean(pwp_df_psb$pwp)
+sd(pwp_df_psb$pwp)
+```
+```{r}
+#print mean and standard deviation of the pwps
+mean(pwp_df_psb_active$pwp)
+sd(pwp_df_psb_active$pwp)
+```
+
+#Finding Our Answer
+
+#Detroit Lions info
+```{r}
+pwp_df_whole[(pwp_df_whole$team_name == "Detroit Lions"),]
+pwp_df_whole_active[(pwp_df_whole_active$team_name == "Detroit Lions"),]
+pwp_df_psb[(pwp_df_psb$team_name == "Detroit Lions"),]
+pwp_df_psb_active[(pwp_df_psb_active$team_name == "Detroit Lions"),]
+```
+
+Is the NFL team with the worst performance history the Detroit Lions?
+```{r}
+#Among All Teams
+pwp_df_whole[which(pwp_df_whole$actual_wp == min(pwp_df_whole$actual_wp), arr.ind = TRUE),]
+
+#Among All Active Teams
+pwp_df_whole_active[which(pwp_df_whole_active$actual_wp == min(pwp_df_whole_active$actual_wp), arr.ind = TRUE),]
+
+#Among All Teams Post Super Bowl
+pwp_df_psb[which(pwp_df_psb$actual_wp == min(pwp_df_psb$actual_wp), arr.ind = TRUE),]
+
+#Among All Active Teams Post Super Bowl
+pwp_df_psb_active[which(pwp_df_psb_active$actual_wp == min(pwp_df_psb_active$actual_wp), arr.ind = TRUE),]
+```
+
+
+Is the Unluckiest NFL team in history the Detroit Lions?
+```{r}
+#Among All Teams
+pwp_df_whole[which(pwp_df_whole$error == min(pwp_df_whole$error), arr.ind = TRUE),]
+
+#Among All Active Teams
+pwp_df_whole_active[which(pwp_df_whole_active$error == min(pwp_df_whole_active$error), arr.ind = TRUE),]
+
+#Among All Teams Post Super Bowl
+pwp_df_psb[which(pwp_df_psb$error == min(pwp_df_psb$error), arr.ind = TRUE),]
+
+#Among All Active Teams Post Super Bowl
+pwp_df_psb_active[which(pwp_df_psb_active$error == min(pwp_df_psb_active$error), arr.ind = TRUE),]
+```
+
+
+Is the Detroit Lions' actual win percentage significantly lower than the rest of the NFL teams?
+```{r}
+(mean(pwp_df_whole$actual_wp) - pwp_df_whole[(pwp_df_whole$team_name == "Detroit Lions"),7])/sd(pwp_df_whole$actual_wp)
+
+(mean(pwp_df_whole_active$actual_wp) - pwp_df_whole_active[(pwp_df_whole_active$team_name == "Detroit Lions"),7])/sd(pwp_df_whole_active$actual_wp)
+
+(mean(pwp_df_psb$actual_wp) - pwp_df_psb[(pwp_df_psb$team_name == "Detroit Lions"),7])/sd(pwp_df_psb$actual_wp)
+
+(mean(pwp_df_psb_active$actual_wp) - pwp_df_psb_active[(pwp_df_psb_active$team_name == "Detroit Lions"),7])/sd(pwp_df_psb_active$actual_wp)
+```
+
+Is the Detroit Lions' Pythagorean win percentage significantly lower than the rest of the NFL teams?
+```{r}
+(mean(pwp_df_whole$pwp) - pwp_df_whole[(pwp_df_whole$team_name == "Detroit Lions"),8])/sd(pwp_df_whole$pwp)
+
+(mean(pwp_df_whole_active$pwp) - pwp_df_whole_active[(pwp_df_whole_active$team_name == "Detroit Lions"),8])/sd(pwp_df_whole_active$pwp)
+
+(mean(pwp_df_psb$pwp) - pwp_df_psb[(pwp_df_psb$team_name == "Detroit Lions"),8])/sd(pwp_df_psb$pwp)
+
+(mean(pwp_df_psb_active$pwp) - pwp_df_psb_active[(pwp_df_psb_active$team_name == "Detroit Lions"),8])/sd(pwp_df_psb_active$pwp)
+```
+
+Is the Detroit Lions' actual win percentage significantly less than their Pythagorean win percentage?
+```{r}
+(mean(pwp_df_whole$error) - pwp_df_whole[(pwp_df_whole$team_name == "Detroit Lions"),9])/sd(pwp_df_whole$error)
+
+(mean(pwp_df_whole_active$error) - pwp_df_whole_active[(pwp_df_whole_active$team_name == "Detroit Lions"),9])/sd(pwp_df_whole_active$error)
+
+(mean(pwp_df_psb$error) - pwp_df_psb[(pwp_df_psb$team_name == "Detroit Lions"),9])/sd(pwp_df_psb$error)
+
+(mean(pwp_df_psb_active$error) - pwp_df_psb_active[(pwp_df_psb_active$team_name == "Detroit Lions"),9])/sd(pwp_df_psb_active$error)
+```
